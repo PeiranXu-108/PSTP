@@ -1,0 +1,48 @@
+export const questions = [
+  // ========== 经济维度 (Economic) E1-E20 ==========
+  { id: 'E1',  dimension: 'economic', text: '政府应当对富人征收更高税率以缩小贫富差距', weight: 2.0, direction: -1 },
+  { id: 'E2',  dimension: 'economic', text: '私营企业通常比国有企业更高效', weight: 1.5, direction: 1 },
+  { id: 'E3',  dimension: 'economic', text: '医疗应由政府统一提供，而不是市场化', weight: 1.8, direction: -1 },
+  { id: 'E4',  dimension: 'economic', text: '最低工资法会损害就业机会', weight: 1.5, direction: 1 },
+  { id: 'E5',  dimension: 'economic', text: '国家应当保障每个人的基本收入', weight: 1.8, direction: -1 },
+  { id: 'E6',  dimension: 'economic', text: '自由市场会自然带来资源的最佳配置', weight: 1.6, direction: 1 },
+  { id: 'E7',  dimension: 'economic', text: '大型企业应受到更严格的监管', weight: 1.4, direction: -1 },
+  { id: 'E8',  dimension: 'economic', text: '资本收益税应与劳动收入税率一致', weight: 1.2, direction: -1 },
+  { id: 'E9',  dimension: 'economic', text: '私有化通常能改善公共服务质量', weight: 1.3, direction: 1 },
+  { id: 'E10', dimension: 'economic', text: '关键基础设施应由国家控制', weight: 1.7, direction: -1 },
+  { id: 'E11', dimension: 'economic', text: '贫困主要是个人努力不足的结果', weight: 1.4, direction: 1 },
+  { id: 'E12', dimension: 'economic', text: '工会在现代经济中仍然至关重要', weight: 1.3, direction: -1 },
+  { id: 'E13', dimension: 'economic', text: '政府不应干预市场价格', weight: 1.6, direction: 1 },
+  { id: 'E14', dimension: 'economic', text: '金融行业需要更严格监管', weight: 1.2, direction: -1 },
+  { id: 'E15', dimension: 'economic', text: '减税通常会促进经济增长', weight: 1.4, direction: 1 },
+  { id: 'E16', dimension: 'economic', text: '公共教育应完全免费', weight: 1.5, direction: -1 },
+  { id: 'E17', dimension: 'economic', text: '企业利润最大化是经济发展的核心动力', weight: 1.3, direction: 1 },
+  { id: 'E18', dimension: 'economic', text: '社会保障支出应该扩大', weight: 1.7, direction: -1 },
+  { id: 'E19', dimension: 'economic', text: '政府补贴往往扭曲市场竞争', weight: 1.1, direction: 1 },
+  { id: 'E20', dimension: 'economic', text: '收入再分配是社会正义的必要手段', weight: 2.0, direction: -1 },
+
+  // ========== 权威维度 (Authoritarian) A1-A20 ==========
+  { id: 'A1',  dimension: 'authoritarian', text: '国家安全应优先于个人隐私', weight: 1.8, direction: 1 },
+  { id: 'A2',  dimension: 'authoritarian', text: '政府不应限制言论，即使是极端言论', weight: 2.0, direction: -1 },
+  { id: 'A3',  dimension: 'authoritarian', text: '严格的法律与秩序是社会稳定的基础', weight: 1.7, direction: 1 },
+  { id: 'A4',  dimension: 'authoritarian', text: '公民应有权公开批评政府', weight: 1.6, direction: -1 },
+  { id: 'A5',  dimension: 'authoritarian', text: '对犯罪应实施更严厉的惩罚', weight: 1.5, direction: 1 },
+  { id: 'A6',  dimension: 'authoritarian', text: '政府不应干涉个人生活方式', weight: 1.7, direction: -1 },
+  { id: 'A7',  dimension: 'authoritarian', text: '媒体应受到更严格监管', weight: 1.3, direction: 1 },
+  { id: 'A8',  dimension: 'authoritarian', text: '个人自由高于国家利益', weight: 1.8, direction: -1 },
+  { id: 'A9',  dimension: 'authoritarian', text: '社会需要强有力的领导者', weight: 1.6, direction: 1 },
+  { id: 'A10', dimension: 'authoritarian', text: '公民有权拒绝不公正法律', weight: 1.4, direction: -1 },
+  { id: 'A11', dimension: 'authoritarian', text: '扩大监控有助于预防犯罪', weight: 1.5, direction: 1 },
+  { id: 'A12', dimension: 'authoritarian', text: '学校应鼓励独立思考而非服从', weight: 1.3, direction: -1 },
+  { id: 'A13', dimension: 'authoritarian', text: '国家在紧急状态下可以限制基本权利', weight: 1.8, direction: 1 },
+  { id: 'A14', dimension: 'authoritarian', text: '多元文化应受到法律保护', weight: 1.2, direction: -1 },
+  { id: 'A15', dimension: 'authoritarian', text: '军事力量是维护国家利益的必要工具', weight: 1.4, direction: 1 },
+  { id: 'A16', dimension: 'authoritarian', text: '公民应拥有广泛的集会自由', weight: 1.6, direction: -1 },
+  { id: 'A17', dimension: 'authoritarian', text: '社会价值观应受到传统规范保护', weight: 1.5, direction: 1 },
+  { id: 'A18', dimension: 'authoritarian', text: '政府应尊重少数群体权利', weight: 1.4, direction: -1 },
+  { id: 'A19', dimension: 'authoritarian', text: '国家可以限制互联网自由以维护稳定', weight: 1.7, direction: 1 },
+  { id: 'A20', dimension: 'authoritarian', text: '法律应保障公民最大限度的自由', weight: 2.0, direction: -1 },
+]
+
+export const QUESTIONS_PER_PAGE = 5
+export const TOTAL_PAGES = Math.ceil(questions.length / QUESTIONS_PER_PAGE)

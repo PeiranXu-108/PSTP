@@ -1,0 +1,47 @@
+:root {
+  --color-left-auth: #ef4444;
+  --color-left-auth-bg: #ef444420;
+  --color-right-auth: #3b82f6;
+  --color-right-auth-bg: #3b82f620;
+  --color-left-lib: #22c55e;
+  --color-left-lib-bg: #22c55e20;
+  --color-right-lib: #eab308;
+  --color-right-lib-bg: #eab30820;
+
+  --color-bg: #0f172a;
+  --color-bg-card: #1e293b;
+  --color-text: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-border: #334155;
+  --color-primary: #6366f1;
+  --color-primary-hover: #818cf8;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
