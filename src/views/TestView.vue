@@ -1,33 +1,50 @@
 <template>
   <div class="test-view">
-    <div class="progress-section">
-      <div class="progress-header">
-        <span class="progress-label">答题进度</span>
-        <span class="progress-count">{{ answeredCount }} / {{ totalQuestions }} 题</span>
+
+    <!-- Progress header -->
+    <div class="progress-card">
+      <div class="progress-top">
+        <div class="progress-info">
+          <span class="progress-title">答题进度</span>
+          <span class="progress-fraction">
+            <strong>{{ answeredCount }}</strong> / {{ totalQuestions }} 题已完成
+          </span>
+        </div>
+        <span class="progress-pct">{{ progressPercent }}%</span>
       </div>
-      <el-progress
-        :percentage="progressPercent"
-        :stroke-width="8"
-        :show-text="false"
-        color="#6366f1"
-      />
-      <div class="steps-row">
-        <div
+      <div class="progress-track" role="progressbar" :aria-valuenow="progressPercent" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-fill" :style="{ width: progressPercent + '%' }"></div>
+      </div>
+      <div class="steps-row" aria-label="章节进度">
+        <button
           v-for="page in totalPages"
           :key="page"
           class="step-dot"
           :class="{
             active: page === currentStep,
-            done: page < currentStep || isPageComplete(page),
+            done: isPageComplete(page) && page !== currentStep,
           }"
+          :aria-label="`第 ${page} 页`"
+          :aria-current="page === currentStep ? 'step' : undefined"
           @click="goToPage(page)"
         >
-          {{ page }}
-        </div>
+          <template v-if="isPageComplete(page) && page !== currentStep">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+              <path d="M2 5l2.5 2.5L8 3" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </template>
+          <template v-else>{{ page }}</template>
+        </button>
       </div>
     </div>
 
-    <transition name="fade" mode="out-in">
+    <!-- Page label -->
+    <div class="page-label">
+      第 {{ currentStep }} / {{ totalPages }} 页
+    </div>
+
+    <!-- Questions -->
+    <transition name="slide" mode="out-in">
       <div class="questions-list" :key="currentStep">
         <QuestionCard
           v-for="q in currentQuestions"
@@ -39,38 +56,55 @@
       </div>
     </transition>
 
-    <div class="nav-buttons">
-      <el-button
-        size="large"
+    <!-- Navigation -->
+    <div class="nav-bar">
+      <button
+        class="btn btn-ghost"
         :disabled="currentStep === 1"
         @click="prevPage"
+        aria-label="上一页"
       >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
         上一页
-      </el-button>
-      <el-button
+      </button>
+
+      <span class="nav-hint" v-if="!isCurrentPageComplete">
+        请完成本页所有题目
+      </span>
+
+      <button
         v-if="currentStep < totalPages"
-        type="primary"
-        size="large"
+        class="btn btn-primary"
         :disabled="!isCurrentPageComplete"
         @click="nextPage"
+        aria-label="下一页"
       >
         下一页
-      </el-button>
-      <el-button
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <button
         v-else
-        type="success"
-        size="large"
+        class="btn btn-success"
         :disabled="!allAnswered"
         @click="submitTest"
+        aria-label="提交并查看结果"
       >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
         提交并查看结果
-      </el-button>
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, watch, onBeforeUnmount } from 'vue'
+import { computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -93,16 +127,16 @@ const currentQuestions = computed(() => {
   return questions.slice(start, start + QUESTIONS_PER_PAGE)
 })
 
-const isCurrentPageComplete = computed(() => {
-  return currentQuestions.value.every(q => answers.value[q.id] !== undefined)
-})
+const isCurrentPageComplete = computed(() =>
+  currentQuestions.value.every(q => answers.value[q.id] !== undefined)
+)
 
 const allAnswered = computed(() => answeredCount.value === totalQuestions)
 
 function isPageComplete(page) {
   const start = (page - 1) * QUESTIONS_PER_PAGE
-  const pageQuestions = questions.slice(start, start + QUESTIONS_PER_PAGE)
-  return pageQuestions.every(q => answers.value[q.id] !== undefined)
+  return questions.slice(start, start + QUESTIONS_PER_PAGE)
+    .every(q => answers.value[q.id] !== undefined)
 }
 
 function setAnswer(questionId, value) {
@@ -115,21 +149,17 @@ function goToPage(page) {
 }
 
 function prevPage() {
-  if (currentStep.value > 1) {
-    goToPage(currentStep.value - 1)
-  }
+  if (currentStep.value > 1) goToPage(currentStep.value - 1)
 }
 
 function nextPage() {
-  if (currentStep.value < totalPages) {
-    goToPage(currentStep.value + 1)
-  }
+  if (currentStep.value < totalPages) goToPage(currentStep.value + 1)
 }
 
 async function submitTest() {
   try {
     await ElMessageBox.confirm(
-      '确认提交你的所有回答？提交后不可修改。',
+      '确认提交你的所有回答？',
       '提交确认',
       { confirmButtonText: '确认提交', cancelButtonText: '再看看', type: 'info' }
     )
@@ -144,11 +174,11 @@ const encourageShown = { 50: false, 80: false }
 watch(progressPercent, (val) => {
   if (val >= 50 && val < 55 && !encourageShown[50]) {
     encourageShown[50] = true
-    ElMessage({ message: '已经过半了！你独特的思想画卷马上就要揭晓', type: 'success', duration: 3000 })
+    ElMessage({ message: '已经过半了！你独特的思想画卷马上揭晓', type: 'success', duration: 3000 })
   }
   if (val >= 80 && val < 85 && !encourageShown[80]) {
     encourageShown[80] = true
-    ElMessage({ message: '马上就要完成了！坚持住', type: 'success', duration: 3000 })
+    ElMessage({ message: '快完成了！坚持住', type: 'success', duration: 3000 })
   }
 })
 
@@ -156,7 +186,7 @@ onBeforeRouteLeave(async (to) => {
   if (answeredCount.value > 0 && !store.state.result && to.name !== 'Result') {
     try {
       await ElMessageBox.confirm(
-        '你的答题进度已自动保存，下次可继续。确认离开吗？',
+        '进度已自动保存，下次可继续。确认离开？',
         '离开确认',
         { confirmButtonText: '确认离开', cancelButtonText: '继续答题', type: 'warning' }
       )
@@ -170,109 +200,204 @@ onBeforeRouteLeave(async (to) => {
 
 <style scoped>
 .test-view {
-  max-width: 720px;
+  max-width: 680px;
   margin: 0 auto;
 }
 
-.progress-section {
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
+/* Progress card */
+.progress-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
 }
 
-.progress-header {
+.progress-top {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 12px;
-  font-size: 14px;
+  align-items: flex-end;
+  margin-bottom: 10px;
 }
 
-.progress-label {
-  color: var(--color-text-secondary);
-}
-
-.progress-count {
-  color: var(--color-primary);
+.progress-title {
+  font-size: 12px;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text-3);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.progress-fraction {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.progress-fraction strong {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.progress-pct {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-track {
+  height: 6px;
+  background: var(--bg-subtle);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  border-radius: 3px;
+  transition: width 0.3s ease;
 }
 
 .steps-row {
   display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 16px;
+  gap: 6px;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 }
 
 .step-dot {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  border: 2px solid var(--color-border);
-  color: var(--color-text-secondary);
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-3);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: var(--transition);
+  font-family: inherit;
 }
 
-.step-dot:hover {
-  border-color: var(--color-primary);
+.step-dot:hover { border-color: var(--primary); color: var(--primary); }
+.step-dot.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.step-dot.done { border-color: #bbf7d0; background: #f0fdf4; }
+
+/* Page label */
+.page-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: 12px;
 }
 
-.step-dot.active {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: #fff;
-}
-
-.step-dot.done {
-  border-color: #22c55e;
-  color: #22c55e;
-}
-
+/* Questions */
 .questions-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
-.nav-buttons {
+/* Nav bar */
+.nav-bar {
   display: flex;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 32px;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
   padding-bottom: 40px;
 }
 
-.nav-buttons .el-button {
-  min-width: 140px;
+.nav-hint {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text-3);
+  text-align: center;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.25s ease;
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--transition);
+  white-space: nowrap;
 }
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+
+.btn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none !important;
 }
+
+.btn-ghost {
+  background: var(--bg-card);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:not(:disabled):hover {
+  background: var(--bg-subtle);
+  color: var(--text);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(37,99,235,.20);
+  margin-left: auto;
+}
+
+.btn-primary:not(:disabled):hover {
+  background: var(--primary-hover);
+  box-shadow: 0 4px 12px rgba(37,99,235,.28);
+  transform: translateY(-1px);
+}
+
+.btn-success {
+  background: var(--success);
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(22,163,74,.20);
+  margin-left: auto;
+}
+
+.btn-success:not(:disabled):hover {
+  background: #15803d;
+  box-shadow: 0 4px 12px rgba(22,163,74,.28);
+  transform: translateY(-1px);
+}
+
+/* Transition */
+.slide-enter-active, .slide-leave-active {
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.slide-enter-from { opacity: 0; transform: translateX(12px); }
+.slide-leave-to   { opacity: 0; transform: translateX(-12px); }
 
 @media (max-width: 640px) {
-  .progress-section {
-    padding: 16px;
-  }
-  .step-dot {
-    width: 28px;
-    height: 28px;
-    font-size: 11px;
-  }
-  .nav-buttons .el-button {
-    min-width: 110px;
-  }
+  .nav-bar { flex-wrap: wrap; }
+  .btn-primary, .btn-success { width: 100%; justify-content: center; }
+  .btn-ghost { width: 100%; justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide-enter-active, .slide-leave-active { transition: none; }
+  .progress-fill { transition: none; }
 }
 </style>
