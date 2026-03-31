@@ -1,8 +1,12 @@
 import { questions } from '../data/questions.js'
 
-export function calculateScores(answers) {
-  const economicQuestions = questions.filter(q => q.dimension === 'economic')
-  const authoritarianQuestions = questions.filter(q => q.dimension === 'authoritarian')
+export function calculateScores(answers, selectedQuestionIds) {
+  const pool = selectedQuestionIds?.length
+    ? questions.filter(q => selectedQuestionIds.includes(q.id))
+    : questions.filter(q => answers[q.id] !== undefined)
+
+  const economicQuestions = pool.filter(q => q.dimension === 'economic')
+  const authoritarianQuestions = pool.filter(q => q.dimension === 'authoritarian')
 
   const calcDimension = (dimQuestions) => {
     let rawScore = 0

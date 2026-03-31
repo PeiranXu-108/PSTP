@@ -4,7 +4,7 @@
     <div class="result-header">
       <div class="result-badge">测试结果</div>
       <h1 class="result-title">你的政治光谱坐标</h1>
-      <p class="result-sub">基于 40 道题的加权评分，你被定位在以下位置</p>
+      <p class="result-sub">基于本次测试中随机抽取的 40 道题的加权评分，你被定位在以下位置</p>
     </div>
 
     <!-- Chart -->

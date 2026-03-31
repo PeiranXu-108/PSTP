@@ -104,18 +104,28 @@
 </template>
 
 <script setup>
-import { computed, watch } from 'vue'
+import { computed, watch, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import QuestionCard from '../components/QuestionCard.vue'
-import { questions, QUESTIONS_PER_PAGE, TOTAL_PAGES } from '../data/questions.js'
+import { questions, QUESTIONS_PER_PAGE } from '../data/questions.js'
 
 const store = useStore()
 const router = useRouter()
 
-const totalQuestions = questions.length
-const totalPages = TOTAL_PAGES
+const idToQuestion = new Map(questions.map(q => [q.id, q]))
+
+const selectedQuestions = computed(() =>
+  store.state.selectedQuestionIds
+    .map(id => idToQuestion.get(id))
+    .filter(Boolean),
+)
+
+const totalQuestions = computed(() => selectedQuestions.value.length)
+const totalPages = computed(() =>
+  Math.max(1, Math.ceil(totalQuestions.value / QUESTIONS_PER_PAGE)),
+)
 
 const currentStep = computed(() => store.state.currentStep)
 const answers = computed(() => store.state.answers)
@@ -124,20 +134,26 @@ const progressPercent = computed(() => store.getters.progressPercent)
 
 const currentQuestions = computed(() => {
   const start = (currentStep.value - 1) * QUESTIONS_PER_PAGE
-  return questions.slice(start, start + QUESTIONS_PER_PAGE)
+  return selectedQuestions.value.slice(start, start + QUESTIONS_PER_PAGE)
 })
 
 const isCurrentPageComplete = computed(() =>
   currentQuestions.value.every(q => answers.value[q.id] !== undefined)
 )
 
-const allAnswered = computed(() => answeredCount.value === totalQuestions)
+const allAnswered = computed(() => answeredCount.value === totalQuestions.value)
 
 function isPageComplete(page) {
   const start = (page - 1) * QUESTIONS_PER_PAGE
-  return questions.slice(start, start + QUESTIONS_PER_PAGE)
+  return selectedQuestions.value.slice(start, start + QUESTIONS_PER_PAGE)
     .every(q => answers.value[q.id] !== undefined)
 }
+
+onMounted(() => {
+  if (!store.state.selectedQuestionIds?.length) {
+    router.replace({ name: 'Home' })
+  }
+})
 
 function setAnswer(questionId, value) {
   store.commit('SET_ANSWER', { questionId, value })
@@ -153,7 +169,8 @@ function prevPage() {
 }
 
 function nextPage() {
-  if (currentStep.value < totalPages) goToPage(currentStep.value + 1)
+  const lastPage = totalPages.value
+  if (currentStep.value < lastPage) goToPage(currentStep.value + 1)
 }
 
 async function submitTest() {

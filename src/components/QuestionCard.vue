@@ -1,11 +1,11 @@
 <template>
   <div class="q-card" :class="{ answered: modelValue !== undefined }">
-    <div class="q-header">
+    <!-- <div class="q-header">
       <span class="q-id">{{ question.id }}</span>
       <span class="q-dim" :class="question.dimension">
         {{ question.dimension === 'economic' ? '经济' : '权威' }}
       </span>
-    </div>
+    </div> -->
     <p class="q-text">{{ question.text }}</p>
     <div class="options" role="radiogroup" :aria-label="question.text">
       <button

@@ -4,10 +4,9 @@
     <!-- Hero -->
     <section class="hero">
       <div class="hero-badge">政治学研究工具</div>
-      <h1 class="hero-title">探索你的<br>政治光谱坐标</h1>
+      <h1 class="hero-title">探索你的政治光谱坐标</h1>
       <p class="hero-desc">
-        40 道精心设计的题目，沿经济与权威两个维度衡量你的政治倾向，
-        并在国际通用坐标图上标出你的位置。
+         40 道题在二维坐标图上标出你的位置
       </p>
 
       <div class="cta-group">
@@ -23,7 +22,7 @@
           @click="resumeTest"
           aria-label="继续上次测试"
         >
-          继续上次（{{ answeredCount }}/40 题）
+          继续上次（{{ answeredCount }}/{{ testQuestionCount }} 题）
         </button>
       </div>
 
@@ -44,13 +43,6 @@
           数据不离开设备
         </span>
         <span class="meta-sep">·</span>
-        <span class="meta-item">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
-            <path d="M12 8v4l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          40 道题
-        </span>
       </div>
     </section>
 
@@ -129,6 +121,7 @@ const router = useRouter()
 
 const hasUnfinished = computed(() => store.getters.hasUnfinished)
 const answeredCount = computed(() => store.getters.answeredCount)
+const testQuestionCount = computed(() => store.getters.testQuestionCount)
 
 function startTest() {
   store.dispatch('startNewTest')
